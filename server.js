@@ -1,25 +1,38 @@
 // const http = require('http');
 const express = require('express');
-
+const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
-// const server = http.createServer(app);
 
-app.use('/', (req,res,next)=>{
-  console.log('This always runs')
-  next()
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+//Body Parser
+app.use(bodyParser.urlencoded({extended: false}));
+//Static files (read access)
+app.use(express.static(path.join(__dirname, 'public')));
+//Routing
+app.use('/admin', adminRoutes)
+app.use(shopRoutes)
+
+app.use((req,res,next)=>{
+  res.status(404).sendFile(path.join(__dirname, 'views', '404.html'))
 })
 
-app.use('/add-product', (req, res, next) => {
-  console.log("In the 2nd middleware");
-  res.send('<form><input type="text" name="title"><button type="submit">Add Product</button></form>');
-});
-
-app.use('/', (req, res, next) => {
-  console.log("In the 2nd middleware");
-  res.send('<h1>Hello from express</h1>');
-});
 
 app.listen(3000);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //app.use([path,]callback[,callback])...
 
