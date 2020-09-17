@@ -8,7 +8,15 @@ const router = express.Router();
 //For Templating Engines
 router.get('/', (req, res, next) => {
   const { products } = adminData
-  res.render('shop', {prods: products, docTitle: 'Shop'})
+  res.render('shop', {
+    prods: products, 
+    pageTitle: 'Shop', 
+    path: "/", 
+    hasProducts: products.length > 0, 
+    activeShop: true,
+    productCSS: true,
+    // layout: false -> turns off main layout
+  })
 })
 
 // router.get('/', (req, res, next) => {
