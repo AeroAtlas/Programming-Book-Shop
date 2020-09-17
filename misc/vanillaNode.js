@@ -58,3 +58,10 @@ module.exports = reqHandler;
 // }
 
 // exports.handler = reqHandler;
+
+// router.get('/', (req, res, next) => {
+//   console.log('shop.js',adminData.products);
+//   res.sendFile(path.join(rootDir, 'views', 'shop.html'));
+// });
+  // res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
+  // res.status(404).sendFile(path.join(__dirname, 'views', '404.html'))

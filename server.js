@@ -1,33 +1,31 @@
-// const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-// const expressHbs = require('express-handlebars')
 
+//Initialize Express
 const app = express();
 
 //Set global config value and tell express where to find templates
-// app.engine('hbs', expressHbs({layoutsDir: 'views/layouts/', defaultLayout: 'main-layout', extname: "hbs"}));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 //Create Route Variables
-const adminData = require('./routes/admin');
+const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 //Body Parser
 app.use(bodyParser.urlencoded({extended: false}));
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
 //Routing
-app.use('/admin', adminData.routes)
-app.use(shopRoutes)
+app.use('/admin', adminRoutes);
+app.use('/', shopRoutes);
 
+//Render 404 if no routes are hit
 app.use((req,res,next)=>{
   res.status(404).render('404', {pageTitle: 'Page Not Found'});
-  // res.status(404).sendFile(path.join(__dirname, 'views', '404.html'))
 })
 
-
+//Run Server
 app.listen(3000);
 
 
