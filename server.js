@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+//Controller
+const errorController = require('./controllers/error')
+
 //Initialize Express
 const app = express();
 
@@ -21,9 +24,7 @@ app.use('/admin', adminRoutes);
 app.use('/', shopRoutes);
 
 //Render 404 if no routes are hit
-app.use((req,res,next)=>{
-  res.status(404).render('404', {pageTitle: 'Page Not Found'});
-})
+app.use(errorController.noPageFound)
 
 //Run Server
 app.listen(3000);
