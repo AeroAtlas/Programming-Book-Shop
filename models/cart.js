@@ -28,11 +28,21 @@ module.exports = class Cart {
   static deleteProduct(id, prodPrice){
     fs.readFile(p, (err, fileContent) => {
       if(err){ return }
-      const updatedCart = {...cart};
-      const product = updatedCart.products.findIndex(prod => prod.id === id)
+      const updatedCart = {...JSON.parse(fileContent)};
+      const product = updatedCart.products.find(prod => prod.id === id)
+      if(!product){
+        return;
+      }
       updatedCart.products = updatedCart.products.filter(prod => prod.id !== id)
       updatedCart.totalPrice -= (prodPrice * product.qty);
       fs.writeFile(p, JSON.stringify(updatedCart), (err) => console.log(err))
+    })
+  }
+
+  static getCart(cb){
+    fs.readFile(p, (err, fileContent) => {
+      const cart = JSON.parse(fileContent);
+      err ? cb(null) : cb(cart)
     })
   }
 }
