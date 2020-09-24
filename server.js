@@ -4,7 +4,7 @@ const path = require('path');
 
 //Controller
 const errorController = require('./controllers/error')
-const db = require("./util/database");
+const sequelize = require("./util/database");
 //Initialize Express
 const app = express();
 
@@ -15,11 +15,6 @@ app.set('views', 'views');
 //Create Route Variables
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-
-//Run Database Connection
-// db.execute("SELECT * FROM products")
-//   .then((result) => {console.log(result[0])})
-//   .catch((err) => {console.log(err)});
 
 //Body Parser
 app.use(bodyParser.urlencoded({extended: false}));
@@ -32,8 +27,18 @@ app.use('/', shopRoutes);
 //Render 404 if no routes are hit
 app.use(errorController.noPageFound)
 
-//Run Server
-app.listen(3000);
+//Look at all models
+sequelize.sync()
+  .then(result => {
+    //Run Server
+    app.listen(3000);
+  })
+  .catch(err => {
+    console.log(err)
+  })
+
+
+
 
 
 
