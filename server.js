@@ -4,7 +4,7 @@ const path = require('path');
 
 //Controller
 const errorController = require('./controllers/error')
-
+const db = require("./util/database");
 //Initialize Express
 const app = express();
 
@@ -15,6 +15,12 @@ app.set('views', 'views');
 //Create Route Variables
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+
+//Run Database Connection
+// db.execute("SELECT * FROM products")
+//   .then((result) => {console.log(result[0])})
+//   .catch((err) => {console.log(err)});
+
 //Body Parser
 app.use(bodyParser.urlencoded({extended: false}));
 //Static files (read access)
