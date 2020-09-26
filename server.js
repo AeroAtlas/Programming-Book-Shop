@@ -4,7 +4,15 @@ const path = require('path');
 
 //Controller
 const errorController = require('./controllers/error')
+//Database
 const sequelize = require("./util/database");
+//Models
+const Product = require("./models/product");
+const User = require("./models/user");
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 //Initialize Express
 const app = express();
 
@@ -16,21 +24,62 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
+//? Middleware (incomming requests are only funned through Middleware)
 //Body Parser
 app.use(bodyParser.urlencoded({extended: false}));
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
+//Find User Middleware
+app.use((req,res,next) => {
+  User.findByPk(1)
+    .then(user => {
+      req.user = user
+      next();
+    })
+    .catch(err => console.log(err))
+})
 //Routing
 app.use('/admin', adminRoutes);
 app.use('/', shopRoutes);
-
 //Render 404 if no routes are hit
 app.use(errorController.noPageFound)
 
+//Associations/Relations
+Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});//If delete User then Products User added are deleted
+User.hasMany(Product);
+
+Cart.belongsTo(User);
+User.hasOne(Cart);
+
+Cart.belongsToMany(Product, {through: CartItem});
+Product.belongsToMany(Cart, {through: CartItem});
+
+Order.belongsTo(User);
+User.hasMany(Order);
+
+Order.belongsToMany(Product, {through: OrderItem});
+Product.belongsToMany(Order, {through: OrderItem});
+
 //Look at all models
-sequelize.sync()
+sequelize
+  // .sync({force: true}) // Use to reset tables
+  .sync()
   .then(result => {
-    //Run Server
+    return User.findByPk(1);
+  })
+  .then(user => {
+    if(!user) {
+      User.create({name: "Bob", email: "e@mail.com"})
+    }
+    // return Promise.resolve(user); manually turn obj into promise (done automatically by .then returns)
+    return user;
+  })
+  .then(user => {
+    //Create Cart
+    return user.createCart();
+  })
+  .then(cart => { 
+    //Start Server
     app.listen(3000);
   })
   .catch(err => {
