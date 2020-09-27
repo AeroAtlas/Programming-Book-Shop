@@ -6,6 +6,8 @@ const path = require('path');
 const errorController = require('./controllers/error');
 //Database
 const {mongoConnect} = require("./util/database");
+//Models 
+const User = require("./models/user")
 //Initialize Express
 const app = express();
 
@@ -24,14 +26,14 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 //Find User Middleware
 app.use((req,res,next) => {
-  // User.findByPk(1)
-  //   .then(user => {
-  //     req.user = user
-  //     next();
-  //   })
-  //   .catch(err => console.log(err))
-  next();
+  User.findById("5f702746dc6b86039d69ae16")
+    .then(user => {
+      req.user = user
+      next();
+    })
+    .catch(err => console.log(err))
 })
+
 //Routing
 app.use('/admin', adminRoutes);
 app.use('/', shopRoutes);

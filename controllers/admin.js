@@ -10,7 +10,7 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req,res,next)=> {
   const {title, price, description, imageUrl} = req.body
-  const product = new Product(title, price, description, imageUrl)
+  const product = new Product(title, price, description, imageUrl, null, req.user._id)
     product.save()
       .then(result => {
         console.log("Created Product")
@@ -58,15 +58,12 @@ exports.getProducts = (req, res, next) => {
     .catch(err => console.log(err));
 }
 
-// exports.postDeleteProduct = (req,res,next) => {
-//   const { productId } = req.body
-//   Product.findByPk(productId)
-//     .then(product => {
-//       return product.destroy()
-//     })
-//     .then(result => {
-//       console.log("Destroyed Product");
-//       res.redirect('/admin/products');
-//     })
-//     .catch(err => console.log(err))
-// }
+exports.postDeleteProduct = (req,res,next) => {
+  const { productId } = req.body
+  Product.deleteById(productId)
+    .then(() => {
+      console.log("Destroyed Product");
+      res.redirect('/admin/products');
+    })
+    .catch(err => console.log(err))
+}
