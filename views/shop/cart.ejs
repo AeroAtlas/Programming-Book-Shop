@@ -10,9 +10,9 @@
           <%products.map(prod => {%>
             <li class="cart__item">
               <h1><%= prod.title %></h1>
-              <h2>Quantity: <%= prod.cartItem.quantity %></h2>
+              <h2>Quantity: <%= prod.quantity %></h2>
               <form action="/cart-delete-item" method="POST">
-                <input type="hidden" value="<%= prod.id %>" name="productId">
+                <input type="hidden" value="<%= prod._id %>" name="productId">
                 <button class="btn" type="submit">Delete</button>
               </form>
             </li>  
