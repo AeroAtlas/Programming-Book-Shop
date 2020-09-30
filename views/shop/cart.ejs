@@ -9,11 +9,11 @@
         <ul class="cart__item-list">
           <%products.map(prod => {%>
             <li class="cart__item">
-              <h1><%= prod.title %></h1>
+              <h1><%= prod.productId.title %></h1>
               <h2>Quantity: <%= prod.quantity %></h2>
               <form action="/cart-delete-item" method="POST">
-                <input type="hidden" value="<%= prod._id %>" name="productId">
-                <button class="btn" type="submit">Delete</button>
+                <input type="hidden" value="<%= prod.productId._id %>" name="productId">
+                <button class="btn danger" type="submit">Delete</button>
               </form>
             </li>  
           <%})%>

@@ -1,11 +1,12 @@
+require("dotenv").config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const mongoose = require("mongoose")
+const session = require("express-session")
 
 //Controller
 const errorController = require('./controllers/error');
-//Database
-const {mongoConnect} = require("./util/database");
 //Models 
 const User = require("./models/user")
 //Initialize Express
@@ -18,17 +19,20 @@ app.set('views', 'views');
 //Create Route Variables
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 //? Middleware (incomming requests are only funned through Middleware)
 //Body Parser
 app.use(bodyParser.urlencoded({extended: false}));
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
+//Sessions
+app.use(session({secret: process.env.SECRET}))
 //Find User Middleware
 app.use((req,res,next) => {
-  User.findById("5f702746dc6b86039d69ae16")
+  User.findById("5f738120b72eea54042dc5af")
     .then(user => {
-      req.user = new User(user.name, user.email, user.cart, user._id)
+      req.user = user;
       next();
     })
     .catch(err => console.log(err))
@@ -37,13 +41,23 @@ app.use((req,res,next) => {
 //Routing
 app.use('/admin', adminRoutes);
 app.use('/', shopRoutes);
+app.use('/', authRoutes);
 //Render 404 if no routes are hit
 app.use(errorController.noPageFound)
 
 //Database Connect
-mongoConnect(() => {
-  app.listen(3000)
-})
+mongoose.connect(process.env.MONGODB_PASS)
+  .then(() => {
+    User.findOne().then(user => {
+      if(!user){
+        const user = new User({name: "Bob", email: "bob@test.com", cart: {items: []}})
+        user.save()
+      }
+    }).catch(err => console.log(err))
+
+    app.listen(3000)
+  })
+  .catch(err => console.log(err))
 
 
 
