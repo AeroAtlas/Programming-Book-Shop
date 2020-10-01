@@ -34,8 +34,7 @@ exports.getIndex = (req, res, next) => {
       res.render('shop/index', {
         prods: products, 
         pageTitle: 'Shop', 
-        path: "/",
-        isAuthenticated: req.session.isLoggedIn
+        path: "/"
       });
     }).catch(err => console.log(err))
 }
@@ -87,7 +86,7 @@ exports.postOrder = (req,res,next) => {
       const products = user.cart.items.map(item => ({product: {...item.productId._doc}, quantity: item.quantity}))
       const order = new Order({
         products: products,
-        user: {name: req.user.name, userId: req.user}
+        user: {email: req.user.email, userId: req.user}
       });
       return order.save()
     })

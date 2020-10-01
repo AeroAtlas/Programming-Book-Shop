@@ -5,6 +5,10 @@ const path = require('path');
 const mongoose = require("mongoose")
 const session = require("express-session")
 const MongoDBStore = require("connect-mongodb-session")(session)
+const csrf = require("csurf");
+
+//PORT
+const PORT = 3000 || process.env.PORT
 
 //Controller
 const errorController = require('./controllers/error');
@@ -16,6 +20,8 @@ const app = express();
 const store = new MongoDBStore({
   uri: process.env.MONGODB_PASS, collection: "sessions"
 })
+//CSRF Protection
+const csrfProtection = csrf();
 
 //Set global config value and tell express where to find templates
 app.set('view engine', 'ejs');
@@ -32,7 +38,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
 //Sessions
-app.use(session({secret: process.env.SECRET, resave: false, saveUninitialized: false, store: store}))
+app.use(session({secret: process.env.SECRET, resave: false, saveUninitialized: false, store: store}));
+//CSRF
+app.use(csrfProtection);
+
 
 //User middleware for mongoose model
 app.use((req,res,next) => {
@@ -47,6 +56,13 @@ app.use((req,res,next) => {
   .catch(err => console.log(err))
 })
 
+//Authentication Middleware
+app.use((req,res,next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+})
+
 //Routing
 app.use('/admin', adminRoutes);
 app.use('/', shopRoutes);
@@ -56,16 +72,7 @@ app.use(errorController.noPageFound)
 
 //Database Connect
 mongoose.connect(process.env.MONGODB_PASS)
-  .then(() => {
-    User.findOne().then(user => {
-      if(!user){
-        const user = new User({name: "Bob", email: "bob@test.com", cart: {items: []}})
-        user.save()
-      }
-    }).catch(err => console.log(err))
-
-    app.listen(3000)
-  })
+  .then(() => app.listen(PORT))
   .catch(err => console.log(err))
 
 
