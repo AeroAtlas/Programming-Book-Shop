@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require("mongoose")
 const session = require("express-session")
+const MongoDBStore = require("connect-mongodb-session")(session)
 
 //Controller
 const errorController = require('./controllers/error');
@@ -11,6 +12,10 @@ const errorController = require('./controllers/error');
 const User = require("./models/user")
 //Initialize Express
 const app = express();
+//Initialize Store
+const store = new MongoDBStore({
+  uri: process.env.MONGODB_PASS, collection: "sessions"
+})
 
 //Set global config value and tell express where to find templates
 app.set('view engine', 'ejs');
@@ -27,15 +32,19 @@ app.use(bodyParser.urlencoded({extended: false}));
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
 //Sessions
-app.use(session({secret: process.env.SECRET}))
-//Find User Middleware
+app.use(session({secret: process.env.SECRET, resave: false, saveUninitialized: false, store: store}))
+
+//User middleware for mongoose model
 app.use((req,res,next) => {
-  User.findById("5f738120b72eea54042dc5af")
-    .then(user => {
-      req.user = user;
-      next();
-    })
-    .catch(err => console.log(err))
+  if(!req.session.user){
+    return next()
+  }
+  User.findById(req.session.user._id)
+  .then(user => {
+    req.user = user
+    next();
+  })
+  .catch(err => console.log(err))
 })
 
 //Routing
