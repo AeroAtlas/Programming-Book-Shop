@@ -6,6 +6,7 @@ const mongoose = require("mongoose")
 const session = require("express-session")
 const MongoDBStore = require("connect-mongodb-session")(session)
 const csrf = require("csurf");
+const flash = require("connect-flash")
 
 //PORT
 const PORT = 3000 || process.env.PORT
@@ -22,6 +23,7 @@ const store = new MongoDBStore({
 })
 //CSRF Protection
 const csrfProtection = csrf();
+
 
 //Set global config value and tell express where to find templates
 app.set('view engine', 'ejs');
@@ -41,6 +43,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: process.env.SECRET, resave: false, saveUninitialized: false, store: store}));
 //CSRF
 app.use(csrfProtection);
+//Flash
+app.use(flash())
 
 
 //User middleware for mongoose model
