@@ -3,6 +3,7 @@ const crypto = require("crypto")
 const bcrypt = require("bcryptjs"); 
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
+const {validationResult} = require("express-validator/check")
 
 const User = require("../models/user");
 
@@ -40,6 +41,16 @@ exports.getSignup = (req,res,next) => {
 
 exports.postLogin = (req, res, next) => {
   const {email, password} = req.body
+  const errors = validationResult(req)
+  if(!errors.isEmpty()){
+    console.log(errors.array())
+    const errorArray = errors.array().map(err => `${err.msg}`).join(` & `)
+    return res.status(422).render("auth/login", { //422 validation failed code
+      path: '/login',
+      pageTitle: "Login",
+      errorMessage: errorArray //errors.array()[0].msg 
+    }); 
+  }
   User.findOne({email:email})
     .then(user => {
       if(!user){
@@ -70,14 +81,26 @@ exports.postLogin = (req, res, next) => {
 
 exports.postSignup = (req,res,next) => {
   const {email, password, confirmPassword} = req.body;
-  //check for password vs confirmPassword
-  User.findOne({email:email})
-    .then(userData => {
-      if(userData){
-        req.flash('error', 'E-mail is already taken')
-        return res.redirect("/signup")
-      }
-      return bcrypt.hash(password, 12)
+  //need to check for password vs confirmPassword
+  const errors = validationResult(req);
+  //Check for errors
+  if(!errors.isEmpty()){
+    console.log(errors.array())
+    //const errs = [...errors.array(), {msg: "Second error"}]
+    const errorArray = errors.array().map(err => `${err.msg}`).join(` & `)
+    return res.status(422).render("auth/signup", {
+      path: '/signup',
+      pageTitle: "Signup",
+      errorMessage: errorArray
+      }); //422 validation failed code
+  }
+  // User.findOne({email:email})
+  //   .then(userData => {
+  //     if(userData){
+  //       req.flash('error', 'E-mail is already taken')
+  //       return res.redirect("/signup")
+  //     } //* removed return from bcrypt
+      bcrypt.hash(password, 12)
         .then(hashPass => {
           const user = new User({
             email: email, password: hashPass, cart: {items: []}
@@ -94,8 +117,8 @@ exports.postSignup = (req,res,next) => {
           })
         })
         .catch(err => console.log(err))
-    })
-    .catch(err => console.log(err));
+    // })
+    // .catch(err => console.log(err));
 };
 
 exports.postLogout = (req, res, next) => {
