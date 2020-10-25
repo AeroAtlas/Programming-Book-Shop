@@ -27,7 +27,9 @@ exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    errorMessage: req.flash('error')[0]
+    errorMessage: req.flash('error')[0],
+    oldInput: {email:"", password:""},
+    validationErrors: []
   })
 }
 
@@ -35,7 +37,9 @@ exports.getSignup = (req,res,next) => {
   res.render("auth/signup", {
     path: '/signup',
     pageTitle: "Signup",
-    errorMessage: req.flash('error')[0]
+    errorMessage: req.flash('error')[0],
+    oldInput: {email:"", password:"", confirmPassword:""},
+    validationErrors: []
   })
 };
 
@@ -43,19 +47,27 @@ exports.postLogin = (req, res, next) => {
   const {email, password} = req.body
   const errors = validationResult(req)
   if(!errors.isEmpty()){
-    console.log(errors.array())
+    //console.log(errors.array())
     const errorArray = errors.array().map(err => `${err.msg}`).join(` & `)
     return res.status(422).render("auth/login", { //422 validation failed code
       path: '/login',
       pageTitle: "Login",
-      errorMessage: errorArray //errors.array()[0].msg 
+      errorMessage: errorArray, //errors.array()[0].msg 
+      oldInput: {email, password},
+      validationErrors: errors.array()
     }); 
   }
   User.findOne({email:email})
     .then(user => {
       if(!user){
-        req.flash('error', 'Invalid email or password')
-        return res.redirect("/login");
+        //req.flash('error', 'Invalid email or password')
+        return res.status(422).render("auth/login", { //422 validation failed code
+          path: '/login',
+          pageTitle: "Login",
+          errorMessage: 'Invalid email or password', //errors.array()[0].msg 
+          oldInput: {email, password},
+          validationErrors: [] //[{param: "email", param: "password"}]
+        }); 
       }
       bcrypt.compare(password, user.password)
         .then(doMatch => {
@@ -64,12 +76,20 @@ exports.postLogin = (req, res, next) => {
             req.session.user = user;
             return req.session.save(err => {
               if(err){ console.log(err) }
-              return res.redirect("/");
+              res.redirect('/')
             });
-          } else {
-            req.flash('error', 'Invalid email or password')
           }
-          res.redirect("/login");
+          return res.status(422).render("auth/login", { //422 validation failed code
+            path: '/login',
+            pageTitle: "Login",
+            errorMessage: "Invalid Email or Password", //errors.array()[0].msg 
+            oldInput: {email, password},
+            validationErrors: [] //[{param: "email", param: "password"}]
+          }); 
+          // else {
+          //   req.flash('error', 'Invalid email or password')
+          // }
+          // res.redirect("/login");
         })
         .catch(err => {
           console.log(err)
@@ -81,18 +101,18 @@ exports.postLogin = (req, res, next) => {
 
 exports.postSignup = (req,res,next) => {
   const {email, password, confirmPassword} = req.body;
-  //need to check for password vs confirmPassword
   const errors = validationResult(req);
   //Check for errors
   if(!errors.isEmpty()){
-    console.log(errors.array())
-    //const errs = [...errors.array(), {msg: "Second error"}]
+    //console.log(errors.array())
     const errorArray = errors.array().map(err => `${err.msg}`).join(` & `)
-    return res.status(422).render("auth/signup", {
+    return res.status(422).render("auth/signup", { //422 validation failed code
       path: '/signup',
       pageTitle: "Signup",
-      errorMessage: errorArray
-      }); //422 validation failed code
+      errorMessage: errorArray, //errors.array()[0].msg
+      oldInput: {email, password, confirmPassword},
+      validationErrors: errors.array()
+    }); 
   }
   // User.findOne({email:email})
   //   .then(userData => {
