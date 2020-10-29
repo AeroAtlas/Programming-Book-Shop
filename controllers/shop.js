@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
+const {ifErr} = require("../middleware/error-handle")
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -10,11 +11,7 @@ exports.getProducts = (req, res, next) => {
         path: "/products"
       });
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.getProduct = (req, res, next) => {
@@ -27,11 +24,7 @@ exports.getProduct = (req, res, next) => {
         path: "/products"
       })
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.getIndex = (req, res, next) => {
@@ -43,11 +36,7 @@ exports.getIndex = (req, res, next) => {
         path: "/"
       });
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.getCart = (req, res, next) => {
@@ -61,11 +50,7 @@ exports.getCart = (req, res, next) => {
         products: user.cart.items
       })
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.postCart = (req, res, next) => {
@@ -78,11 +63,7 @@ exports.postCart = (req, res, next) => {
       console.log(result)
       res.redirect("/cart")
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.postCartDeleteProduct = (req, res, next) => {
@@ -92,11 +73,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
     .then(() => {
       res.redirect('/cart');
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.postOrder = (req,res,next) => {
@@ -114,11 +91,7 @@ exports.postOrder = (req,res,next) => {
     })
     .then(() => req.user.clearCart())
     .then(() => res.redirect("/orders"))
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.getOrders = (req, res, next) => {
@@ -130,11 +103,7 @@ exports.getOrders = (req, res, next) => {
         orders: orders
       })
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 //* Don't need right now

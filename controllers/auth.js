@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const {validationResult} = require("express-validator/check")
+const {ifErr} = require("../middleware/error-handle")
 
 const User = require("../models/user");
 
@@ -96,11 +97,7 @@ exports.postLogin = (req, res, next) => {
           res.redirect("/login")
         })
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }
 
 exports.postSignup = (req,res,next) => {
@@ -140,11 +137,7 @@ exports.postSignup = (req,res,next) => {
             html: '<h1>You have successfully signed up</h1>'
           })
         })
-        .catch(err => {
-          const error = new Error(err);
-          error.httpStatusCode = 500;
-          return next(error);
-        });
+        .catch(err => next(ifErr(err)));
     // })
     // .catch(err => console.log(err));
 };
@@ -194,11 +187,7 @@ exports.postReset = (req, res, next) => {
           `
         })
       })
-      .catch(err => {
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-      });
+      .catch(err => next(ifErr(err)));
   })
 }
 
@@ -214,11 +203,7 @@ exports.getNewPassword = (req, res, next) => {
         passwordToken: token
       })
     })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 
 }
 
@@ -250,9 +235,5 @@ exports.postNewPassword = (req, res, next) => {
         `
       })
     }) 
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    .catch(err => next(ifErr(err)));
 }

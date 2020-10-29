@@ -1,8 +1,7 @@
 //! Not working as export 
-const ifErr = (err) => {
+exports.ifErr = (err) => {
   const error = new Error(err);
   error.httpStatusCode = 500;
-  return next(error);
+  return error;
 }
 
-module.exports = ifErr;
