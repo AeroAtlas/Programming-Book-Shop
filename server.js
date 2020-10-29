@@ -54,10 +54,13 @@ app.use((req,res,next) => {
   }
   User.findById(req.session.user._id)
   .then(user => {
+    if(!user){
+      return next()
+    }
     req.user = user
     next();
   })
-  .catch(err => console.log(err))
+  .catch(err => { throw new Error(err) })
 })
 
 //Authentication Middleware
@@ -71,8 +74,16 @@ app.use((req,res,next) => {
 app.use('/admin', adminRoutes);
 app.use('/', shopRoutes);
 app.use('/', authRoutes);
+
+//Render 500 if an error occurs
+app.get("/500", errorController.anErrorOccured);
 //Render 404 if no routes are hit
-app.use(errorController.noPageFound)
+app.use(errorController.noPageFound);
+//Error Handling Middleware
+app.use((error, req, res, next) => {
+  //res.status(error.httpStatusCode).render()
+  res.redirect("/500")
+})
 
 //Database Connect
 mongoose.connect(process.env.MONGODB_PASS)

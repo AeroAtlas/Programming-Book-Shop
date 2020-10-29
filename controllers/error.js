@@ -5,3 +5,11 @@ exports.noPageFound = (req,res,next) => {
     isAuthenticated: req.session.isLoggedIn
   });
 }
+
+exports.anErrorOccured = (req,res,next) => {
+  res.status(500).render('500', {
+    pageTitle: 'Some Error Occured',
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn
+  });
+}

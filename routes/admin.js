@@ -16,7 +16,8 @@ router.post('/add-product', [
   body("price")
     .isFloat().withMessage("Price must be a valid price with 2 decimal places"),
   body("description")
-    .isLength({min: 8, max: 200}).withMessage("Description needs to be atleast 8 characters long")
+    .isLength({min: 8}).withMessage("Description needs to be atleast 8 characters long")
+    .isLength({max: 500}).withMessage("Description cannot be longer than 500 characters")
     .trim()
 ], isAuth, adminController.postAddProduct);
 router.get('/edit-product/:productId', isAuth, adminController.getEditProduct)
@@ -30,7 +31,8 @@ router.post('/edit-product', [
   body("price")
     .isFloat().withMessage("Price must be a valid price with 2 decimal places"),
   body("description")
-    .isLength({min: 8, max: 200}).withMessage("Description needs to be atleast 8 characters long")
+    .isLength({min: 8}).withMessage("Description needs to be atleast 8 characters long")
+    .isLength({max: 500}).withMessage("Description cannot be longer than 500 characters")
     .trim()
 ], isAuth, adminController.postEditProduct);
 router.post('/delete-product', isAuth, adminController.postDeleteProduct)
