@@ -15,7 +15,9 @@ exports.getAddProduct = (req, res, next) => {
 }
 
 exports.postAddProduct = (req,res,next)=> {
-  const {title, price, description, imageUrl} = req.body
+  const {title, price, description} = req.body
+  const imageUrl = req.file //is a buffer 
+  console.log(imageUrl)
   const errors = validationResult(req)
   if(!errors.isEmpty()){
     const errorArray = errors.array().map(err => `${err.msg}`).join(` & `)

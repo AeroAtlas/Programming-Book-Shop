@@ -7,6 +7,7 @@ const session = require("express-session")
 const MongoDBStore = require("connect-mongodb-session")(session)
 const csrf = require("csurf");
 const flash = require("connect-flash")
+const multer = require("multer")
 
 //PORT
 const PORT = 3000 || process.env.PORT
@@ -23,6 +24,23 @@ const store = new MongoDBStore({
 })
 //CSRF Protection
 const csrfProtection = csrf();
+//Multer File Storage Config
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images")
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname)
+  }
+})
+//Multer File Storage Filter (might add more file types later)
+const fileFilter = (req, file, cb) => {
+  if(file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+    cb(null, true);
+  }
+  cb(null, false);
+
+}
 
 
 //Set global config value and tell express where to find templates
@@ -35,8 +53,10 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 //? Middleware (incomming requests are only funned through Middleware)
-//Body Parser
+//Body Parser (handles text based)
 app.use(bodyParser.urlencoded({extended: false}));
+//Multer (handles images [input in ejs cannot be named image, so changed both to imageUrl])
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("imageUrl"))
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
 //Sessions

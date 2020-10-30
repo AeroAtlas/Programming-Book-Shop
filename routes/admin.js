@@ -11,8 +11,6 @@ router.post('/add-product', [
     .isString().withMessage("Title must be valid text")
     .isLength({min: 6}).withMessage("Title needs to be atleast 6 characters long")
     .trim(),
-  body("imageUrl")
-    .isURL().withMessage("Image Url must be a valid Url"),
   body("price")
     .isFloat().withMessage("Price must be a valid price with 2 decimal places"),
   body("description")
@@ -26,8 +24,6 @@ router.post('/edit-product', [
     .isString().withMessage("Title must be valid text")
     .isLength({min: 6}).withMessage("Title needs to be atleast 6 characters long")
     .trim(),
-  body("imageUrl")
-    .isURL().withMessage("Image Url must be a valid Url"),
   body("price")
     .isFloat().withMessage("Price must be a valid price with 2 decimal places"),
   body("description")
