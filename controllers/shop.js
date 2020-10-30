@@ -133,7 +133,18 @@ exports.getInvoice = (req, res, next) => {
     //Read/Write Stream
     pdfDoc.pipe(fs.createWriteStream(invoicePath)) //creates/starts write stream
     pdfDoc.pipe(res); //read stream
-    pdfDoc.text("Hello world")
+
+    pdfDoc.fontSize(24).text("Invoice", {
+      underline: true
+    })
+    pdfDoc.text("---------------------")
+    let totalPrice = 0;
+    order.products.map(prod => {
+      pdfDoc.fontSize(16).text(`${prod.product.title} - ${prod.quantity} x $${prod.product.price}`)
+      totalPrice += prod.product.price * prod.quantity
+    })
+    pdfDoc.fontSize(24).text("---------------------")
+    pdfDoc.fontSize(20).text(`Total Price: $${totalPrice}`)
     pdfDoc.end() //ends write stream, saves file, sends response(read stream)
 
 

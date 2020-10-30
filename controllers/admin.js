@@ -1,6 +1,7 @@
 const Product = require('../models/product');
 const {validationResult} = require("express-validator/check")
 const {ifErr} = require("../middleware/error-handle")
+const {deleteFile} = require("../util/file")
 
 exports.getAddProduct = (req, res, next) => {
   // if(!req.session.isLoggedIn){ return res.redirect("/login") }
@@ -100,6 +101,7 @@ exports.postEditProduct = (req, res, next) => {
     product.price = price;
     product.description = description;
     if(image) {
+      deleteFile(product.imageUrl)
       product.imageUrl = image.path;
     }
     return product.save()
@@ -128,11 +130,17 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req,res,next) => {
   const { productId } = req.body
-  //Product.findByIdAndRemove(productId)
-  Product.deleteOne({_id: productId, userId: req.user._id})
+  Product.findById(productId)
+    .then(product => {
+      if(!product){
+        return next(new Error("Product not found"))
+      }
+      deleteFile(product.imageUrl)
+      return Product.deleteOne({_id: productId, userId: req.user._id})
+    })
     .then(() => {
       console.log("Destroyed Product");
       res.redirect('/admin/products');
     })
-    .catch(err => next(ifErr(err)));
+    .catch(err => next(ifErr(err)))
 }
