@@ -2,7 +2,7 @@ const {check, body} = require("express-validator/check")
 const User = require("../models/user")
 
 //Auth Routes Validation
-exports.postLogin = () => {
+exports.Login = () => {
   return [
     check("email")
       .isEmail().withMessage("Invalid Email")
@@ -13,7 +13,7 @@ exports.postLogin = () => {
   ]
 }
 
-exports.postSignup = () => {
+exports.Signup = () => {
   return [
     check("email")
       .isEmail().withMessage("Invalid Email")
@@ -43,7 +43,7 @@ exports.postSignup = () => {
 }
 
 //Admin Routes Validation
-exports.postAddProduct = () => {
+exports.addProduct = () => {
   return [
     body("title")
       .isString().withMessage("Title must be valid text")
@@ -60,8 +60,8 @@ exports.postAddProduct = () => {
   ]
 }
 
-exports.postEditProduct = () => {
-  return [
+exports.editProduct = () => {
+  return (
     body("title")
       .isString().withMessage("Title must be valid text")
       .isLength({min: 6}).withMessage("Title needs to be atleast 6 characters long")
@@ -74,5 +74,18 @@ exports.postEditProduct = () => {
       .isLength({min: 8}).withMessage("Description needs to be atleast 8 characters long")
       .isLength({max: 500}).withMessage("Description cannot be longer than 500 characters")
       .trim()
-  ]
+  )
 }
+
+// [
+//   body("title")
+//     .isString().withMessage("Title must be valid text")
+//     .isLength({min: 6}).withMessage("Title needs to be atleast 6 characters long")
+//     .trim(),
+//   body("price")
+//     .isFloat().withMessage("Price must be a valid price with 2 decimal places"),
+//   body("description")
+//     .isLength({min: 8}).withMessage("Description needs to be atleast 8 characters long")
+//     .isLength({max: 500}).withMessage("Description cannot be longer than 500 characters")
+//     .trim()
+// ]

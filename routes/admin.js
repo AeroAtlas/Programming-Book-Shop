@@ -3,6 +3,7 @@ const {check, body} = require("express-validator/check")
 const router = express.Router();
 const adminController = require("../controllers/admin")
 const isAuth = require("../middleware/is-auth");
+const isValid = require("../middleware/validation")
 
 router.get('/add-product', isAuth, adminController.getAddProduct);
 router.get('/products', isAuth, adminController.getProducts);
