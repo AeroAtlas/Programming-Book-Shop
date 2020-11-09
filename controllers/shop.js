@@ -1,5 +1,7 @@
+require("dotenv").config()
 const fs = require("fs")
 const path = require("path")
+const stripe = require("stripe")(process.env.STRIPE_KEY)
 const PDFDocument = require("pdfkit")
 
 const Product = require('../models/product');
@@ -207,11 +209,40 @@ exports.getInvoice = (req, res, next) => {
 
 }
 
+exports.getCheckout = (req, res, next) => {
+  let products;
+  let total;
+  req.user
+  .populate("cart.items.productId")
+  .execPopulate() //Turns popualte to a promise
+  .then(user => {
+    products = user.cart.items
+    total = products.reduce((acc,curr) => acc + (curr.quantity * curr.productId.price), 0)
 
-//* Don't need right now
-// exports.getCheckout = (req, res, next) => {
-//   res.render('shop/checkout', {
-//     path: '/checkout',
-//     pageTitle: 'Checkout'
-//   })
-// }
+    return stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: products.map(p => (
+        { name: p.productId.title, 
+          description: p.productId.description, 
+          amount: Math.round(p.productId.price * 100), 
+          currency: 'usd',
+          quantity: p.quantity
+        })),
+        success_url: req.protocol + "://" + req.get("host") + "/checkout/success",
+        cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel"
+    })
+    
+  })
+  .then(session => {
+    res.render('shop/checkout', {
+      path: '/checkout',
+      pageTitle: 'Checkout',
+      products: products,
+      totalSum: total,
+      sessionId: session.id
+    })
+  })
+  .catch(err => next(ifErr(err)));
+}
+
+
