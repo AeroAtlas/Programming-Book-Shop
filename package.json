@@ -1,22 +1,23 @@
 {
-  "name": "working-with-node",
+  "name": "programming-book-shop",
   "version": "1.0.0",
-  "description": "Working with Node in a Typescript language. For webdev and security",
+  "description": "Creating a complete web store with Node and EJS",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "watch": "nodemon server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AeroAtlas/Working-With-Node.git"
+    "url": "git+https://github.com/AeroAtlas/Programming-Book-Shop.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AeroAtlas/Working-With-Node/issues"
+    "url": "https://github.com/AeroAtlas/Programming-Book-Shop/issues"
   },
-  "homepage": "https://github.com/AeroAtlas/Working-With-Node#readme",
+  "homepage": "https://github.com/AeroAtlas/Programming-Book-Shop#readme",
   "dependencies": {
     "@types/node": "^14.10.1",
     "bcryptjs": "^2.4.3",
