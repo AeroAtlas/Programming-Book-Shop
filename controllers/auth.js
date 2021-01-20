@@ -3,7 +3,7 @@ const crypto = require("crypto")
 const bcrypt = require("bcryptjs"); 
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
-const {validationResult} = require("express-validator/check")
+const {validationResult} = require("express-validator")
 const {ifErr} = require("../middleware/error-handle")
 
 const User = require("../models/user");
@@ -172,7 +172,7 @@ exports.postReset = (req, res, next) => {
           return res.redirect('/reset')
         }
         user.resetToken = token;
-        user.resetTokenExpiration = Date.now() + 3_600_000
+        user.resetTokenExpiration = Date.now() + 3600000
         return user.save()
       })
       .then(result => {

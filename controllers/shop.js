@@ -8,7 +8,7 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const {ifErr} = require("../middleware/error-handle")
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 5;
 
 
 exports.getProducts = (req, res, next) => {
