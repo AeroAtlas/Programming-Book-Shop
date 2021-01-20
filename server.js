@@ -2,26 +2,26 @@ require("dotenv").config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const mongoose = require("mongoose")
-const session = require("express-session")
-const MongoDBStore = require("connect-mongodb-session")(session)
+const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
-const flash = require("connect-flash")
-const multer = require("multer")
+const flash = require("connect-flash");
+const multer = require("multer");
 
 //PORT
-const PORT = 3000 || process.env.PORT
+const PORT = process.env.PORT || 3000; 
 
 //Controller
 const errorController = require('./controllers/error');
 //Models 
-const User = require("./models/user")
+const User = require("./models/user");
 //Initialize Express
 const app = express();
 //Initialize Store
 const store = new MongoDBStore({
   uri: process.env.MONGODB_PASS, collection: "sessions"
-})
+});
 //CSRF Protection
 const csrfProtection = csrf();
 //Multer File Storage Config
@@ -56,7 +56,7 @@ const authRoutes = require('./routes/auth');
 //Body Parser (handles text based)
 app.use(bodyParser.urlencoded({extended: false}));
 //Multer (handles images [input in ejs cannot be named image, so changed both to imageUrl])
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("imageUrl"))
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("imageUrl"));
 //Static files (read access)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/images", express.static(path.join(__dirname, 'images')));
@@ -65,7 +65,7 @@ app.use(session({secret: process.env.SECRET, resave: false, saveUninitialized: f
 //CSRF
 app.use(csrfProtection);
 //Flash
-app.use(flash())
+app.use(flash());
 
 //Authentication Middleware
 app.use((req,res,next) => {
@@ -78,18 +78,18 @@ app.use((req,res,next) => {
 app.use((req,res,next) => {
   //throw new Error (not async works but it will loop infinitely)
   if(!req.session.user){
-    return next()
+    return next();
   }
   User.findById(req.session.user._id)
   .then(user => {
     if(!user){
-      return next()
+      return next();
     }
     req.user = user
     next();
   })
   .catch(err => { 
-    next(new Error(err)) //all async code needs next() to get error to errorHandle middleware
+    next(new Error(err)); //all async code needs next() to get error to errorHandle middleware
   })
 })
 
@@ -107,56 +107,10 @@ app.use(errorController.noPageFound);
 //Error Handling Middleware
 app.use((error, req, res, next) => {
   //res.status(error.httpStatusCode).render()
-  res.redirect("/500")
-})
+  res.redirect("/500");
+});
 
 //Database Connect
 mongoose.connect(process.env.MONGODB_PASS)
   .then(() => app.listen(PORT))
-  .catch(err => console.log(err))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//app.use([path,]callback[,callback])...
-
-
-
-
-
-//Client -> Request -> Server -> Response -> Client
-
-
-//Stream -> ReqBody1 => ReqBody2 => Buffer[ReqBody3 => ReqBody4] -> Fully Parsed
-
-/*Incoming Req -> MyCode + Single JS Thread 
-                            ->Event Loop(only finish fast finishing code) -> Handle Event Callbacks 
-                            ->"fs" -sent to-> WorkerPool (Does the heavy lifting & runs of diff threads)
-                                                  ->^ triggers callback to EventLoop
-Event Loop  -> Timers(Execute setTimeout, setInterval Callback)
-            -> Pending Callbacks (Execute I/O-related (input/output-disk + network operations ~blocking ops). Callbacks that were defered)
-              ( if too many callbacks it will skip a few and give those callback to the next loop )
-            -> Poll (retrieve new I/O events, execute their callbacks). If not possible defer to pending cb's and check for timers cb's
-            -> Check (execute setImmediate() callbacks) executes immediate after any open callbacks. faster than settimeout. after current cycle
-            -> Close Callbaccks (execute all close event callbacks)
-            --> process.exit (if (refs == 0)) [refs is for every new callback] -1 ever completed callback
-                ** Listen doesn't let refs decrease so it stays looping
-*/
-
-/*
-Middleware -> Request -> Middleware () -> Response
-*/
+  .catch(err => console.log(err));
