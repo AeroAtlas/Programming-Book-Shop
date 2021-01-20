@@ -1,13 +1,18 @@
 require("dotenv").config();
+const path = require('path');
+const fs = require("fs");
+// const https = require("https");
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 
 //PORT
 const PORT = process.env.PORT || 3000; 
@@ -24,6 +29,9 @@ const store = new MongoDBStore({
 });
 //CSRF Protection
 const csrfProtection = csrf();
+//Localhost SSL Encryption Key (TEST)
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert")
 //Multer File Storage Config
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -52,7 +60,16 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
+//Access Log for Storing Data
+const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), {flags:'a'})
+
 //? Middleware (incomming requests are only funned through Middleware)
+//Helmet
+app.use(helmet());
+//Asset Compression
+app.use(compression());
+//Logger
+app.use(morgan("combined", {stream: accessLogStream}));
 //Body Parser (handles text based)
 app.use(bodyParser.urlencoded({extended: false}));
 //Multer (handles images [input in ejs cannot be named image, so changed both to imageUrl])
@@ -66,6 +83,7 @@ app.use(session({secret: process.env.SECRET, resave: false, saveUninitialized: f
 app.use(csrfProtection);
 //Flash
 app.use(flash());
+
 
 //Authentication Middleware
 app.use((req,res,next) => {
@@ -112,5 +130,8 @@ app.use((error, req, res, next) => {
 
 //Database Connect
 mongoose.connect(process.env.MONGODB_PASS)
-  .then(() => app.listen(PORT))
+  .then(() => {
+    // https.createServer({key: privateKey, cert: certificate},app).listen(PORT)
+    app.listen(PORT)
+  })
   .catch(err => console.log(err));
