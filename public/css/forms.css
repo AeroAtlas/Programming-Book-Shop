@@ -12,17 +12,17 @@
 
 .form-control input,
 .form-control textarea {
-  border: 1px solid #a1a1a1;
+  border: 1px solid #44475a;
   font: inherit;
   border-radius: 2px;
 }
 
 .form-control input:focus,
 .form-control textarea:focus {
-  outline-color: #00695c;
+  outline-color: #6272a4;
 }
 
 .form-control input.invalid,
 .form-control textarea.invalid {
-  border-color: red;
+  border-color:#ff5555;
 }

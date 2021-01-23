@@ -29,7 +29,9 @@ npm i
 
 ## Usage
 
-It is hosted on Heroku and downloading the source code would require you to set your own ENV variables and connect it to your own hosting platform.
+* A user can sign-up and login to add products to their cart and purchase using the Stripe API. After which they will be able to get a PDF of their transaction. 
+* A user who is authenticated can also add their own products to be purchased and later edit the image and text of said product at any time.
+* Lastly if a user forgets their password they can choose to reset their password in the LogIn page and an Email will be sent through Node Mailer
 
 ## License
 

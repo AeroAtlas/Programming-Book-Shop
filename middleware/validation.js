@@ -76,16 +76,3 @@ exports.editProduct = () => {
       .trim()
   )
 }
-
-// [
-//   body("title")
-//     .isString().withMessage("Title must be valid text")
-//     .isLength({min: 6}).withMessage("Title needs to be atleast 6 characters long")
-//     .trim(),
-//   body("price")
-//     .isFloat().withMessage("Price must be a valid price with 2 decimal places"),
-//   body("description")
-//     .isLength({min: 8}).withMessage("Description needs to be atleast 8 characters long")
-//     .isLength({max: 500}).withMessage("Description cannot be longer than 500 characters")
-//     .trim()
-// ]
